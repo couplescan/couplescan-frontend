@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CoupleScan - Analyze Your Relationship</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body class="bg-gray-100 font-sans leading-normal tracking-normal"> 
+    <header class="bg-white shadow">
+        <nav class="container mx-auto px-6 py-4">
+            <div class="text-lg font-bold text-gray-800">CoupleScan</div>
+        </nav>
+    </header>
+
+    <main class="container mx-auto px-6 py-8">
+        <section id="heroSection" class="text-center mb-12">
+            <h1 class="text-4xl font-bold text-gray-800 mb-4">Is Your Relationship Healthy?</h1>
+            <p class="text-xl text-gray-600 mb-8">Paste your chat history below for an unbiased AI analysis.</p>
+        </section>
+
+        <section id="inputSection" class="mb-12">
+            <label for="chatInput" class="block text-gray-700 text-sm font-bold mb-2">Paste Your Chat Log Here (Min. 50 characters):</label>
+            <textarea id="chatInput" rows="10" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" placeholder="Her: Hey! Had a great time... Him: Me too!..."></textarea>
+            <button id="analyzeButton" class="mt-4 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
+                Analyze My Chat
+            </button>
+        </section>
+
+        <section id="loadingSection" class="text-center mb-12 hidden">
+            <div class="inline-block animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-blue-500"></div>
+            <p class="text-gray-600 mt-2">Analyzing your conversation...</p>
+        </section>
+
+        <section id="paywallSection" class="bg-white p-6 rounded shadow-md text-center mb-12 hidden">
+            <h2 class="text-2xl font-bold text-gray-800 mb-3">Analysis Teaser:</h2>
+            <p id="teaserText" class="text-lg text-gray-700 mb-6">[Teaser text will appear here]</p>
+            <a id="payButton" href="#" target="_blank" class="bg-green-500 hover:bg-green-700 text-white font-bold py-3 px-6 rounded text-xl focus:outline-none focus:shadow-outline">
+                Unlock Full Report ($9.99)
+            </a>
+            <p class="text-sm text-gray-500 mt-4">(You will be redirected to our secure payment processor)</p>
+        </section>
+
+        <section id="errorSection" class="text-center text-red-500 font-bold mb-12 hidden">
+             <p id="errorMessage"></p>
+        </section>
+
+    </main>
+
+    <footer class="bg-white mt-12 py-6">
+        <div class="container mx-auto px-6 text-center text-gray-600 text-sm">
+            © 2025 CoupleScan. All rights reserved. | <a href="#" class="hover:underline">Privacy Policy</a> | <a href="#" class="hover:underline">Terms of Service</a> 
+        </div>
+    </footer>
+
+    <script src="assets/js/app.js"></script>
+</body>
+</html>
