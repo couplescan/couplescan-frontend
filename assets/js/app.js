@@ -1,11 +1,11 @@
 // --- Configuration ---
-// Make sure this URL matches the one Render gave you for your backend.
-// For local testing, use: const apiUrl = "http://127.0.0.1:8000";
 const apiUrl = "https://couplescan-backend-app.onrender.com"; // Replace with your actual Render URL!
 const lemonSqueezyCheckoutLink = "YOUR_LEMON_SQUEEZY_CHECKOUT_LINK"; // Replace with your actual Lemon Squeezy product link!
 
 // --- Get DOM Elements ---
+const userIdentifierElement = document.getElementById("userIdentifier");
 const chatInputElement = document.getElementById("chatInput");
+const zipFileInputElement = document.getElementById("zipFileInput"); // Added
 const analyzeButtonElement = document.getElementById("analyzeButton");
 const loadingSectionElement = document.getElementById("loadingSection");
 const paywallSectionElement = document.getElementById("paywallSection");
@@ -13,41 +13,40 @@ const teaserTextElement = document.getElementById("teaserText");
 const payButtonElement = document.getElementById("payButton");
 const errorSectionElement = document.getElementById("errorSection");
 const errorMessageElement = document.getElementById("errorMessage");
-const inputSectionElement = document.getElementById("inputSection"); // Added for hiding later
-const heroSectionElement = document.getElementById("heroSection");   // Added for hiding later
+const inputSectionElement = document.getElementById("inputSection");
+const heroSectionElement = document.getElementById("heroSection");
 
-// --- Helper Functions ---
+// --- Helper Functions (showLoading, hideLoading, showPaywall, showError - remain mostly the same) ---
 
 function showLoading() {
   loadingSectionElement.classList.remove("hidden");
-  errorSectionElement.classList.add("hidden"); // Hide previous errors
-  paywallSectionElement.classList.add("hidden"); // Hide paywall if shown before
-  analyzeButtonElement.disabled = true; // Prevent multiple clicks
-  analyzeButtonElement.textContent = "Analyzing..."; // Change button text
+  errorSectionElement.classList.add("hidden"); 
+  paywallSectionElement.classList.add("hidden"); 
+  analyzeButtonElement.disabled = true; 
+  analyzeButtonElement.textContent = "Analyzing..."; 
 }
 
 function hideLoading() {
   loadingSectionElement.classList.add("hidden");
   analyzeButtonElement.disabled = false;
-  analyzeButtonElement.textContent = "Analyze My Chat"; // Reset button text
+  analyzeButtonElement.textContent = "Analyze My Chat"; 
 }
 
 function showPaywall(reportId, teaserText) {
-  hideLoading(); // Ensure loading is hidden
-  heroSectionElement.classList.add("hidden"); // Hide original intro
-  inputSectionElement.classList.add("hidden"); // Hide input section
-  
-  teaserTextElement.textContent = teaserText; // Update teaser text
+  hideLoading(); 
+  heroSectionElement.classList.add("hidden"); 
+  inputSectionElement.classList.add("hidden"); 
 
-  // Construct the checkout URL with the report_id embedded
+  teaserTextElement.textContent = teaserText; 
+
   const checkoutUrlWithId = `${lemonSqueezyCheckoutLink}?checkout[custom][report_id]=${reportId}`;
-  payButtonElement.href = checkoutUrlWithId; // Set the button link
+  payButtonElement.href = checkoutUrlWithId; 
 
-  paywallSectionElement.classList.remove("hidden"); // Show the paywall
+  paywallSectionElement.classList.remove("hidden"); 
 }
 
 function showError(message) {
-  hideLoading(); // Ensure loading is hidden
+  hideLoading(); 
   errorMessageElement.textContent = message;
   errorSectionElement.classList.remove("hidden");
 }
@@ -55,58 +54,82 @@ function showError(message) {
 // --- Main Analysis Function ---
 
 async function analyzeChat() {
-  const chatLog = chatInputElement.value;
+  // Clear previous errors
+  errorSectionElement.classList.add("hidden");
 
-  // Basic validation
-  if (!chatLog || chatLog.length < 50) {
-    showError("Please paste at least 50 characters of your chat log.");
-    return;
+  // 1. Get User Identifier
+  const userIdentifier = userIdentifierElement ? userIdentifierElement.value.trim() : "";
+  if (!userIdentifier) {
+    showError("Please enter your name or identifier as it appears in the chat.");
+    return; 
   }
 
+  // 2. Determine Input Source (File or Text)
+  const file = zipFileInputElement ? zipFileInputElement.files[0] : null;
+  const chatLog = chatInputElement ? chatInputElement.value : "";
+
+  const formData = new FormData();
+  formData.append('user_identifier', userIdentifier);
+
+  let inputProvided = false;
+
+  if (file) {
+      if (file.type === 'application/zip' || file.name.toLowerCase().endsWith('.zip')) {
+          formData.append('file', file);
+          inputProvided = true;
+          console.log("Preparing to send zip file..."); // For debugging
+      } else {
+          showError("Invalid file type. Please upload a .zip file.");
+          return;
+      }
+  } else if (chatLog && chatLog.length >= 50) {
+      formData.append('chat_log', chatLog);
+      inputProvided = true;
+      console.log("Preparing to send chat log text..."); // For debugging
+  }
+
+  if (!inputProvided) {
+      showError("Please paste at least 50 characters of chat text OR upload a WhatsApp .zip export.");
+      return;
+  }
+
+  // 3. Show Loading and Make API Call
   showLoading();
 
   try {
+    console.log("Sending request to:", `${apiUrl}/analyze`); // For debugging
     const response = await fetch(`${apiUrl}/analyze`, {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ chat_log: chatLog }), // Send data as JSON
+      // 'Content-Type' header is set automatically by the browser for FormData
+      body: formData, 
     });
 
-    // Check if the request was successful (status code 2xx)
+    console.log("Received response status:", response.status); // For debugging
+
     if (!response.ok) {
-        // Try to get error details from the response body
         let errorDetail = `HTTP error! Status: ${response.status}`;
         try {
             const errorData = await response.json();
-            errorDetail = errorData.detail || errorDetail; // Use detail from backend if available
+            errorDetail = errorData.detail || errorDetail; 
         } catch (e) {
-            // If response is not JSON, use the status text
-            errorDetail = `${errorDetail} - ${response.statusText}`;
+            errorDetail = `${errorDetail} - ${response.statusText || 'Server error'}`;
         }
         throw new Error(errorDetail);
     }
 
-    // Parse the JSON response from the backend
     const data = await response.json();
+    console.log("Received data:", data); // For debugging
 
-    // Store the report ID locally (optional but can be useful)
     localStorage.setItem('report_id', data.report_id);
-
-    // Show the paywall with the received data
     showPaywall(data.report_id, data.teaser_text);
 
   } catch (error) {
-    console.error("Error during analysis:", error); // Log the full error to the console
-    // Display a user-friendly error message
-    showError(`Analysis failed: ${error.message}. Please try again later.`);
+    console.error("Error during analysis fetch:", error); 
+    showError(`Analysis failed: ${error.message}. Please check console or try again later.`);
   }
 }
 
 // --- Event Listener ---
-
-// Attach the analyzeChat function to the button's click event
 if (analyzeButtonElement) {
     analyzeButtonElement.addEventListener("click", analyzeChat);
 } else {

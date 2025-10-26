@@ -21,8 +21,24 @@
         </section>
 
         <section id="inputSection" class="mb-12">
-            <label for="chatInput" class="block text-gray-700 text-sm font-bold mb-2">Paste Your Chat Log Here (Min. 50 characters):</label>
-            <textarea id="chatInput" rows="10" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" placeholder="Her: Hey! Had a great time... Him: Me too!..."></textarea>
+            <div class="mb-4">
+                <label for="userIdentifier" class="block text-gray-700 text-sm font-bold mb-2">
+                    Your Name/Identifier in the Chat: <span class="text-red-500">*</span>
+                </label>
+                <input type="text" id="userIdentifier" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" placeholder="E.g., 'Anant', 'Partner A', 'Me'" required>
+                <p class="text-xs text-gray-500 mt-1">Tell us who 'you' are in the chat so the advice is tailored correctly.</p>
+            </div>
+            <div class="mb-4">
+                <label for="chatInput" class="block text-gray-700 text-sm font-bold mb-2">Paste Your Chat Log Here (Min. 50 characters):</label>
+                <textarea id="chatInput" rows="10" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" placeholder="Her: Hey! Had a great time... Him: Me too!..."></textarea>
+            </div>
+            <div class="mt-4">
+                <label for="zipFileInput" class="block text-gray-700 text-sm font-bold mb-2">
+                    Or Upload WhatsApp Chat Export (.zip):
+                </label>
+                <input type="file" id="zipFileInput" accept=".zip" class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100">
+                <p class="text-xs text-gray-500 mt-1">Make sure to export 'Without Media'. You can upload instead of pasting text.</p>
+            </div>
             <button id="analyzeButton" class="mt-4 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
                 Analyze My Chat
             </button>
@@ -35,7 +51,14 @@
 
         <section id="paywallSection" class="bg-white p-6 rounded shadow-md text-center mb-12 hidden">
             <h2 class="text-2xl font-bold text-gray-800 mb-3">Analysis Teaser:</h2>
-            <p id="teaserText" class="text-lg text-gray-700 mb-6">[Teaser text will appear here]</p>
+            <p id="teaserText" class="text-lg text-gray-700 mb-2">[Teaser text will appear here]</p>
+
+            <div class="relative h-20 sm:h-24 md:h-28 w-full overflow-hidden mb-6 pointer-events-none"> 
+                <div class="absolute inset-x-0 bottom-0 h-full bg-gradient-to-t from-gray-100 via-gray-100 to-transparent"></div>
+                <p class="absolute inset-0 text-center text-gray-400 italic blur-sm select-none px-4 py-8">
+                    ... unlock the full, detailed analysis below ...
+                </p>
+            </div>
             <a id="payButton" href="#" target="_blank" class="bg-green-500 hover:bg-green-700 text-white font-bold py-3 px-6 rounded text-xl focus:outline-none focus:shadow-outline">
                 Unlock Full Report ($9.99)
             </a>
